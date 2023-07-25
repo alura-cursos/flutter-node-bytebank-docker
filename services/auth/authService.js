@@ -57,7 +57,7 @@ app.get('/find-id/:userId', (req, res) => {
 
   const user = users.find((u) => u.id === userId);
   if (user) {
-    res.json({name: user.name});
+    res.json({id: user.id, name: user.name});
   } else {
     res.status(401).json({ erro: 'usuario nao encontrado' });
   }
@@ -73,7 +73,7 @@ app.get('/find-email/:email', (req, res) => {
   const user = users.find((u) => u.email === email);
 
   if (user) {
-    res.json({name: user.name});
+    res.json({id: user.id, name: user.name});
   } else {
     res.status(401).json({ erro: 'usuario nao encontrado' });
   }
