@@ -5,31 +5,61 @@ const uuid = require('uuid');
 const app = express();
 app.use(bodyParser.json());
 
-const accounts = [];
+const PORT = 3002
+
+class Balance {
+  constructor(userId, balance, pin){
+    this.userId = userId;
+    this.balance = balance;
+    this.pin = pin;
+  }
+}
+
+const balances = [
+  new Balance("ID001", 2350, "14863"),
+];
+
+app.post('/has-pin', (req, res) => {
+  const {userId} = req.body;
+
+  if (userId === undefined){
+    return res.status(400).json({erro: "requisicao invalida"});
+  }
+
+  const balance = balances.find((u) => u.userId === userId);
+  if (!balance){
+    res.json({hasPin: false});
+  }
+  res.json({hasPin: true});
+});
 
 app.post('/create-pin', (req, res) => {
-  const { userId, password } = req.body;
-  const user = users.find((u) => u.id === userId && u.password === password);
-  if (!user) {
-    return res.status(401).json({ message: 'Invalid credentials' });
-  }
+  const { userId, newPin } = req.body;  
 
-  const newPin = uuid.v4();
-  accounts.push({ userId, pin: newPin });
-  res.json({ message: 'PIN created successfully' });
+  if (userId === undefined || newPin === undefined){
+    return res.status(400).json({erro: "requisicao invalida"});
+  }
+  
+  const bal = balances.push({ userId, pin: newPin, balance: Math.floor(Math.random() * 2000) + 1000});
+  res.json({ mensagem: 'pin criado com sucesso', balance: bal.balance });
 });
 
-app.post('/check-balance', (req, res) => {
+app.post('/balance', (req, res) => {
   const { userId, pin } = req.body;
-  const account = accounts.find((acc) => acc.userId === userId && acc.pin === pin);
-  if (!account) {
-    return res.status(401).json({ message: 'Invalid PIN' });
+
+  if (userId === undefined || pin === undefined){
+    res.status(400).json({erro: "requisicao invalida"});
   }
 
-  // Replace this with a more elaborate balance retrieval mechanism (e.g., database lookup).
-  res.json({ balance: 1000 });
+  const bal = balances.find((acc) => acc.userId === userId && acc.pin === pin);
+
+  if (!bal) {
+    return res.status(401).json({ erro: 'pin inválido' });
+  }
+
+  res.json({ balance: bal.balance });
 });
 
-app.listen(3002, () => {
-  console.log('Balance service running on port 3002');
+app.listen(PORT, () => {
+  console.log(`Serviço de Saldo: Rodando na porta ${PORT}.`);
 });
