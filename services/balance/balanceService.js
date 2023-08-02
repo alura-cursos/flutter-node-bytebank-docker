@@ -40,8 +40,11 @@ app.post('/create-pin', (req, res) => {
     return res.status(400).json({erro: "requisicao invalida"});
   }
   
-  const bal = balances.push({ userId, pin: newPin, balance: Math.floor(Math.random() * 2000) + 1000});
-  res.json({ mensagem: 'pin criado com sucesso', balance: bal.balance });
+  var newBalance = new Balance(userId, Math.floor(Math.random() * 1999.9) + 1000, newPin);
+
+  const bal = balances.push(newBalance);
+
+  res.json({ balance: newBalance.balance });
 });
 
 app.post('/balance', (req, res) => {
